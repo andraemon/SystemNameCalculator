@@ -40,6 +40,7 @@ namespace SystemNameCalculator.NameGen
 
                     if (charWeights.ElementAt(0).Key == '0')
                     {
+                        Logging.PrintDebug(add.ToString());
                         if (add < 3) break;
                         cache1[0] = cache1[0].Add(new byte[] { 0x01 }).And(new byte[] { 0x07, 0x00, 0x00, 0x80 });
                         if (BitConverter.ToInt32(cache1[0].Zxd(4)) < 0) cache1[0]
@@ -87,6 +88,7 @@ namespace SystemNameCalculator.NameGen
                         }
 
                         name += charWeights.ElementAt(index).Key;
+                        add -= 1;
                     }
 
                     if (name.Length > 63) name = name[..64];

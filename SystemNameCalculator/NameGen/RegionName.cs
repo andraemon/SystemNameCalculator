@@ -9,6 +9,7 @@ namespace SystemNameCalculator.NameGen
 {
     public static class RegionName
     {
+        // 0364:0078:0CE5:010A
         public static void FormatName(byte[] seed)
         {
             byte[][] register = new byte[2][];
@@ -21,29 +22,45 @@ namespace SystemNameCalculator.NameGen
 
             register[0] = seed.Shr(4);
             register[0][0] /= 2;
-            register[0] = seed.Xor(register[0]).Multiply(new byte[] { 0xD7, 0x31, 0xBD, 0x2C, 0x48, 0x81, 0xDD, 0x64 });
+            register[0] = register[0].Xor(seed).Multiply(new byte[] { 0xD7, 0x31, 0xBD, 0x2C, 0x48, 0x81, 0xDD, 0x64 });
             Array.Resize(ref register[0], 8);
-            register[0] = BitConverter.GetBytes(BitConverter.ToInt32(register[0].Shr(4)) / 2).Xor(register[0])
-                .Multiply(new byte[] { 0x97, 0x29, 0x61, 0x13, 0xC6, 0xA5, 0x6A, 0xE3});
-            Array.Resize(ref register[0], 8);
-            register[0] = BitConverter.GetBytes(BitConverter.ToInt32(register[0].Shr(4)) / 2).Xor(register[0]);
 
-            cache0[0] = register[0].Shl(4);
+            Logging.PrintDebug(register[0].Format());
+            Logging.PrintDebug(BitConverter.GetBytes((uint)(BitConverter.ToUInt32(register[0].Shr(4)) / 2)).Format());
+
+            register[0] = BitConverter.GetBytes((uint)(BitConverter.ToUInt32(register[0].Shr(4)) / 2)).Xor(register[0])
+                .Multiply(new byte[] { 0x97, 0x29, 0x61, 0x13, 0xC6, 0xA5, 0x6A, 0xE3 });
+            Array.Resize(ref register[0], 8);
+
+            Logging.PrintDebug(register[0].Format());
+
+            register[0] = BitConverter.GetBytes((uint)(BitConverter.ToUInt32(register[0].Shr(4)) / 2)).Xor(register[0]);
+
             cache0[1] = register[0].Shl(4).Rol(2).Xor(register[0].Shr(4)).Xor(register[0].Shl(4));
+            cache0[0] = register[0].Shl(4);
 
-            if (BitConverter.ToInt32(register[0].Shl(4)) == 0) cache0[0] = cache0[0].Add(new byte[] { 0x01 });
+            if (BitConverter.ToInt32(cache0[0]) == 0) cache0[0] = cache0[0].Add(new byte[] { 0x01 });
 
             cache0 = cache0.UpdateSeed();
-            cache1[2] = cache0[0].Multiply(new byte[] { 0x04 }).Shr(4).Add(cache1[1]);
+            cache1[2] = cache0[0].Multiply(new byte[] { 0x04 }).Shr(4).Add(new byte[] { 0x06 });
 
             Logging.PrintDebug($"Cache1: {cache1[0].Format()} // {cache1[1].Format()} // {cache1[2].Format()}");
 
             name = Generator.GenerateName(ref cache0, ref cache1);
             name = char.ToUpper(name[0]) + name[1..];
 
+            cache0 = cache0.UpdateSeed();
+
+            if (cache0[0].Multiply(new byte[] { 0x64 }).Shr(4)[0] < 0x50)
+            {
+                cache0 = cache0.UpdateSeed();
+                name = ProcAdornments[cache0[0].Multiply(new byte[] { 0x14 }).Shr(4)[0] + 1].Replace("%NAME%", name);
+            }
+
             Logging.PrintDebug(name);
         }
 
+        #region Command Parsers
         public static byte[] RegionCoordsToByteArray(this string self)
         {
             string result;
@@ -109,5 +126,30 @@ namespace SystemNameCalculator.NameGen
 
             return result.Parse();
         }
+        #endregion
+
+        public static readonly string[] ProcAdornments = new string[]
+        {
+            "%NAME% Adjunct",
+            "%NAME% Void",
+            "%NAME% Expanse",
+            "%NAME% Terminus",
+            "%NAME% Boundary",
+            "%NAME% Fringe",
+            "%NAME% Cluster",
+            "%NAME% Mass",
+            "%NAME% Band",
+            "%NAME% Cloud",
+            "%NAME% Nebula",
+            "%NAME% Quadrant",
+            "%NAME% Sector",
+            "%NAME% Anomaly",
+            "%NAME% Conflux",
+            "%NAME% Instability",
+            "Sea of %NAME%",
+            "The Arm of %NAME%",
+            "%NAME% Spur",
+            "%NAME% Shallows"
+        };
     }
 }
