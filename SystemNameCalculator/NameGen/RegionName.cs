@@ -54,7 +54,7 @@ namespace SystemNameCalculator.NameGen
             if (cache0[0].Multiply(new byte[] { 0x64 }).Shr(4)[0] < 0x50)
             {
                 cache0 = cache0.UpdateSeed();
-                name = ProcAdornments[cache0[0].Multiply(new byte[] { 0x14 }).Shr(4)[0] + 1].Replace("%NAME%", name);
+                name = ProcAdornments[cache0[0].Multiply(new byte[] { 0x14 }).Shr(4)[0]].Replace("%NAME%", name);
             }
 
             Logging.PrintDebug(name);
@@ -68,8 +68,8 @@ namespace SystemNameCalculator.NameGen
 
             if (coords.Length != 4)
             {
-                Logging.PrintError("\nCould not parse coordinates!\n");
-                Logging.PrintError("\nDetails: Wrong number of arguments\n");
+                Logging.PrintError("\nCould not parse coordinates!");
+                Logging.PrintError("Details: Wrong number of arguments\n");
                 return null;
             }
 
@@ -77,8 +77,8 @@ namespace SystemNameCalculator.NameGen
             {
                 if (!short.TryParse(coords[i].ToLower(), NumberStyles.HexNumber, null, out short sh))
                 {
-                    Logging.PrintError("\nCould not parse coordinates!\n");
-                    Logging.PrintError($"\nDetails: Could not convert coordinate {i + 1} to short\n");
+                    Logging.PrintError("\nCould not parse coordinates!");
+                    Logging.PrintError($"Details: Could not convert coordinate {i + 1} to short\n");
                     return null;
                 }
 
@@ -86,12 +86,12 @@ namespace SystemNameCalculator.NameGen
                 else if (i % 2 == 0) sh -= 2047;
 
                 coords[i] = sh.ShortToFormattedHex(Misc.GetRegionTruncation(i));
-                if (Program.Debug) Logging.PrintDebug($"Dec: {sh} // Hex: {coords[i]}");
+                Logging.PrintDebug($"Dec: {sh} // Hex: {coords[i]}");
             }
 
             result = string.Concat(coords[3], coords[1], coords[2], coords[0]);
 
-            if (Program.Debug) Logging.PrintDebug(new string[] { $"GRF: {result}" });
+            Logging.PrintDebug(new string[] { $"GRF: {result}" });
 
             return result.Parse();
         }
@@ -103,8 +103,8 @@ namespace SystemNameCalculator.NameGen
             coords = coords.Skip(2).ToArray();
             if (coords.Length != 4)
             {
-                Logging.PrintError("\nCould not parse coordinates!\n");
-                Logging.PrintError("\nDetails: Wrong number of arguments\n");
+                Logging.PrintError("\nCould not parse coordinates!");
+                Logging.PrintError("Details: Wrong number of arguments\n");
                 return null;
             }
 
@@ -112,17 +112,17 @@ namespace SystemNameCalculator.NameGen
             {
                 if (!short.TryParse(coords[i], out short sh))
                 {
-                    Logging.PrintError("\nCould not parse coordinates!\n");
-                    Logging.PrintError($"\nDetails: Could not convert coordinate {i + 1} to short\n");
+                    Logging.PrintError("\nCould not parse coordinates!");
+                    Logging.PrintError($"Details: Could not convert coordinate {i + 1} to short\n");
                     return null;
                 }
                 coords[i] = sh.ShortToFormattedHex(Misc.GetRegionTruncation(i));
-                if (Program.Debug) Logging.PrintDebug($"Dec: {sh} // Hex: {coords[i]}");
+                Logging.PrintDebug($"Dec: {sh} // Hex: {coords[i]}");
             }
 
             result = string.Concat(coords[3], coords[1], coords[2], coords[0]);
 
-            if (Program.Debug) Logging.PrintDebug(new string[] { $"GRF: {result}" });
+            Logging.PrintDebug(new string[] { $"GRF: {result}" });
 
             return result.Parse();
         }

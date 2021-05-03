@@ -11,7 +11,7 @@ namespace SystemNameCalculator
 {
     public static class Program
     {
-        internal static readonly bool Debug = true;
+        internal static bool Debug = true;
 
         public static void Main()
         {
@@ -29,6 +29,7 @@ namespace SystemNameCalculator
             Console.WriteLine("        coords <string> - Finds the name of a region from its galactic coordinates, as seen in the signal booster.\n");
             Console.WriteLine("        xcoords <x> <y> <z> <galaxyindex> - Finds the name of a region from its galactic coordinates, as seen in the save file.\n");
             Console.WriteLine("        find <string> - Attempts to find coordinates for a region with the given name.\n");
+            Console.WriteLine(System.Text.Encoding.UTF8.GetString("74686B61797A6F52".Parse()));
 
         input:
             Console.ForegroundColor = ConsoleColor.White;
@@ -96,6 +97,11 @@ namespace SystemNameCalculator
                 {
                     Logging.PrintError("\nCould not parse input! Are you sure you typed the command correctly?\n");
                 }
+            }
+            else if (vars[0] == "debug")
+            {
+                Debug = !Debug;
+                Logging.Print("Toggled debug mode!");
             }
             else
             {

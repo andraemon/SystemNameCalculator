@@ -159,6 +159,16 @@ namespace SystemNameCalculator.Utils
             return cache;
         }
 
+        public static byte[][] ReverseSeed(this byte[][] cache, int move = 1)
+        {
+            for (int i = 0; i < move; i++)
+            {
+
+            }
+
+            return cache;
+        }
+
         public static byte[] Sxd(this byte[] op1, int extend)
         {
             List<byte> result = new List<byte>(op1);

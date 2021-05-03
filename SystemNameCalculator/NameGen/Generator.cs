@@ -40,17 +40,19 @@ namespace SystemNameCalculator.NameGen
 
                     if (charWeights.ElementAt(0).Key == '0')
                     {
-                        Logging.PrintDebug(add.ToString());
-                        if (add < 3) break;
+                        Logging.PrintDebug($"Could not find string weights in alphaset {cache1[0][0]}, trying alternate set (add: {add})");
+
+                        tries--;
+                        i--;
                         cache1[0] = cache1[0].Add(new byte[] { 0x01 }).And(new byte[] { 0x07, 0x00, 0x00, 0x80 });
                         if (BitConverter.ToInt32(cache1[0].Zxd(4)) < 0) cache1[0]
                                 = cache1[0].Sub(new byte[] { 0x01 }).Or(new byte[] { 0xF8, 0xFF, 0xFF, 0xFF }).Add(new byte[] { 0x01 });
 
-                        tries--;
-                        i--;
+                        Logging.PrintDebug($"Trying alternate alphaset: {cache1[0][0]}");
 
                         if (tries == 0)
                         {
+                            if (add < 3) break;
                             string temp = GetCharactersFromAlphaset(ref cache0, ref cache1);
 
                             if ("aeiou".Contains(name[i + 2]) && "aeiou".Contains(temp[0])) name += '\'';
@@ -144,6 +146,7 @@ namespace SystemNameCalculator.NameGen
             return name;
         }
 
+        #region Helper Methods
         private static int GetConsecutiveConsonants(string name)
         {
             int consonance = 0;
@@ -211,6 +214,7 @@ namespace SystemNameCalculator.NameGen
 
             return result;
         }
+        #endregion
 
         public static readonly Dictionary<byte, Dictionary<char, JArray>> LetterMap =
             JsonConvert.DeserializeObject<Dictionary<byte, Dictionary<char, JArray>>>
