@@ -22,15 +22,19 @@ namespace SystemNameCalculator
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Commands:\n");
             Console.WriteLine("    /system <command> <arguments>\n");
-            Console.WriteLine("        coords <string:galaxyindex> - Finds the name of a system from its galactic coordinates, as seen in the signal booster.\n");
-            Console.WriteLine("        xcoords <x> <y> <z> <systemindex> <galaxyindex> - Finds the name of a system from its galactic coordinates, as seen in the save file.\n");
-            Console.WriteLine("        find <string> - Attempts to find coordinates for a system with the given name.\n");
+            Console.WriteLine("        coords <string> - Finds the name of a system from its galactic coordinates, as seen in the signal booster.");
+            Console.WriteLine("            Format is XXXX:YYYY:ZZZZ:SYST:GLXY, where the signal booster has the format STRING:XXXX:YYYY:ZZZZ:SYST.\n");
+            Console.WriteLine("        xcoords <x> <y> <z> <systemindex> <galaxyindex> - Finds the name of a system from its galactic coordinates,");
+            Console.WriteLine("            as seen in the save file.\n");
+            Console.WriteLine("        find <string> - Attempts to find coordinates for a system with the given name. Not implemented yet.\n");
             Console.WriteLine("    /region <command> <arguments>\n");
-            Console.WriteLine("        coords <string> - Finds the name of a region from its galactic coordinates, as seen in the signal booster.\n");
-            Console.WriteLine("        xcoords <x> <y> <z> <galaxyindex> - Finds the name of a region from its galactic coordinates, as seen in the save file.\n");
-            Console.WriteLine("        find <string> - Attempts to find coordinates for a region with the given name.\n");
-            Console.WriteLine(System.Text.Encoding.UTF8.GetString("74686B61797A6F52".Parse()));
-
+            Console.WriteLine("        coords <string> - Finds the name of a region from its galactic coordinates, as seen in the signal booster.");
+            Console.WriteLine("            Format is XXXX:YYYY:ZZZZ:GLXY, where the signal booster has the format STRING:XXXX:YYYY:ZZZZ:SYST.\n");
+            Console.WriteLine("        xcoords <x> <y> <z> <galaxyindex> - Finds the name of a region from its galactic coordinates,");
+            Console.WriteLine("            as seen in the save file.\n");
+            Console.WriteLine("        find <string> - Attempts to find coordinates for a region with the given name. Not Implemented yet.\n");
+            Console.WriteLine("    /debug - Toggles debug output.\n");
+             
         input:
             Console.ForegroundColor = ConsoleColor.White;
             Logging.Print("\nWhat is your command?\n");
