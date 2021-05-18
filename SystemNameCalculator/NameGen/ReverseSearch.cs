@@ -13,13 +13,13 @@ namespace SystemNameCalculator.NameGen
         #region Region Methods
         public static void FindRegionSeeds(string name, uint galaxy, int cap = 1)
         {
+            Logging.PrintDebug($"Searching for region with name {name} in galaxy {galaxy} ({galaxy:X})");
             List<ulong> seedList = ConstructRegionRanges(name, cap);
             if (seedList == null)
             {
                 Logging.Print("\nCould not find a region with the given name. Sorry!");
                 return;
             }
-            Logging.PrintDebug($"Searching for region with name {name} in galaxy {galaxy} ({galaxy:X})");
 
             for (int i = 0; i < seedList.Count; i++)
             {
