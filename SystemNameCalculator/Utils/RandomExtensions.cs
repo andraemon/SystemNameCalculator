@@ -19,5 +19,12 @@ namespace SystemNameCalculator.Utils
         {
             seed = unchecked(((seed & 0xFFFFFFFF) * 0x5A76F899) + (seed >> 32));
         }
+
+        public static int Sxd(this ulong self, int bitLength)
+        {
+            string extendee = Convert.ToString((long)self, 2).PadLeft(bitLength, '0');
+            extendee = extendee.PadLeft(32, extendee[0]);
+            return Convert.ToInt32(extendee, 2);
+        }
     }
 }

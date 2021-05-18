@@ -14,7 +14,7 @@ namespace SystemNameCalculator
 {
     public static class Program
     {
-        internal static bool Debug = true;
+        internal static bool Debug = false;
 
         public static void Main()
         {

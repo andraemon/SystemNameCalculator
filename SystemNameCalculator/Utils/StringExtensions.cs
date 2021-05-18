@@ -31,7 +31,7 @@ namespace SystemNameCalculator.Utils
 
         public static string FormatRegionXCoords(this ulong self)
         {
-            return $"X: {self & 0xFFF}, Y: {(self & 0xFF000000) >> 24}, Z: {(self & 0xFFF000) >> 12}";
+            return $"X: {RandomExtensions.Sxd(self & 0xFFF, 12)}, Y: {RandomExtensions.Sxd((self & 0xFF000000) >> 24, 8)}, Z: {RandomExtensions.Sxd((self & 0xFFF000) >> 12, 12)}";
         }
     }
 }
