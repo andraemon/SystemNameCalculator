@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.IO;
 using System.Numerics;
 using System.Text.RegularExpressions;
@@ -13,7 +14,7 @@ namespace SystemNameCalculator
 {
     public static class Program
     {
-        internal static bool Debug = true;
+        internal static bool Debug = false;
 
         public static void Main()
         {
@@ -34,9 +35,9 @@ namespace SystemNameCalculator
             Console.WriteLine("            Format is XXXX:YYYY:ZZZZ:GLXY, where the signal booster has the format STRING:XXXX:YYYY:ZZZZ:SYST.\n");
             Console.WriteLine("        xcoords <x> <y> <z> <galaxyindex> - Finds the name of a region from its galactic coordinates,");
             Console.WriteLine("            as seen in the save file.\n");
-            Console.WriteLine("        find <string> - Attempts to find coordinates for a region with the given name. Not implemented yet.\n");
+            Console.WriteLine("        find <galaxyIndex> <count> <string> - Attempts to find coordinates for a number of regions with the given name\n");
+            Console.WriteLine("            in the given galaxy (where Euclid has index 0).\n");
             Console.WriteLine("    /debug - Toggles debug output.\n");
-            ReverseSearch.FindRegionSeeds("Sea of Summer");
 
             while (true)
             {
@@ -82,7 +83,7 @@ namespace SystemNameCalculator
             {
                 if (vars[1] == "find")
                 {
-                    Logging.Print("\nPlaceholder\n");
+                    ReverseSearch.FindRegionSeeds(string.Join(' ', vars.Skip(4)), Convert.ToUInt32(vars[2]), Convert.ToInt32(vars[3]));
                 }
                 else if (vars[1] == "coords")
                 {

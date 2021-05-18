@@ -11,13 +11,31 @@ namespace SystemNameCalculator.NameGen
     public static class ReverseSearch
     {
         #region Region Methods
-        public static void FindRegionSeeds(string name, int cap = 1)
+        public static void FindRegionSeeds(string name, uint galaxy, int cap = 1)
+        {
+            List<ulong> seedList = ConstructRegionRanges(name, cap);
+            if (seedList == null)
+            {
+                Logging.Print("Could not find a region with the given name. Sorry!");
+                return;
+            }
+            Logging.PrintDebug($"Searching for region with name {name} in galaxy {galaxy} ({galaxy:X})");
+
+            for (int i = 0; i < seedList.Count; i++)
+            {
+                Logging.Print($"Seed {i + 1}");
+                Logging.Print($"    Signal Booster Coords: {StringExtensions.FormatRegionBoosterCoords((seedList[i] ^ galaxy) + (galaxy * 0x100000000u))}");
+                Logging.Print($"    Save File Coords: {StringExtensions.FormatRegionXCoords((seedList[i] ^ galaxy) + (galaxy * 0x100000000u))}");
+                Logging.Print($"    Portal Coords: {StringExtensions.FormatRegionGrfCoords((seedList[i] ^ galaxy) + (galaxy * 0x100000000u))}");
+            }
+        }
+
+        public static List<ulong> ConstructRegionRanges(string name, int cap)
         {
             string origName = name;
             int adorn = -1;
             List<List<WeightData>> weights = new List<List<WeightData>>();
             List<SeedRange> ranges = new List<SeedRange>();
-            List<ulong> seedList = new List<ulong>();
             Random r = new Random();
             string[] split = name.Split();
 
@@ -45,12 +63,12 @@ namespace SystemNameCalculator.NameGen
                 || Generator.VowelInsertedAtStart(name[0], name[1])
                 || Generator.VowelInsertedAtEnd(name[^1], name[^2])
                 || Generator.GetConsecutiveConsonants(name) != -1)
-                return;
+                return null;
 
             Logging.PrintDebug("name format is correct");
 
             weights = GetWeightsForName(name, new byte[] { 0 });
-            if (weights[0] == null) return;
+            if (weights[0] == null) return null;
 
             ranges.Add(new SeedRange(new List<(uint, uint)>(), new List<(uint, uint)> { (0, 0xFFFFFFFF) }, new List<int>()));
             for (int i = 0; i <= 9 - name.Length; i++)
@@ -80,9 +98,7 @@ namespace SystemNameCalculator.NameGen
                 Logging.PrintDebug($"    LinkOffset: {ranges[i].LinkOffset}");
             }
 
-            seedList = ExhaustiveRegionSearch(ranges, cap, origName);
-
-            for (int i = 0; i < seedList.Count; i++) Logging.Print($"{seedList[i]:X}: {origName}");
+            return ExhaustiveRegionSearch(ranges, cap, origName);
         }
 
         // Alternative to smart cracker, actually pretty performant so we'll stick with this for now
