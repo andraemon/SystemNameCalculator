@@ -16,14 +16,14 @@ namespace SystemNameCalculator.NameGen
             List<ulong> seedList = ConstructRegionRanges(name, cap);
             if (seedList == null)
             {
-                Logging.Print("Could not find a region with the given name. Sorry!");
+                Logging.Print("\nCould not find a region with the given name. Sorry!");
                 return;
             }
             Logging.PrintDebug($"Searching for region with name {name} in galaxy {galaxy} ({galaxy:X})");
 
             for (int i = 0; i < seedList.Count; i++)
             {
-                Logging.Print($"Seed {i + 1}");
+                Logging.Print($"\nSeed {i + 1}");
                 Logging.Print($"    Signal Booster Coords: {StringExtensions.FormatRegionBoosterCoords(seedList[i] + (galaxy * 0x100000000u))}");
                 Logging.Print($"    Save File Coords: {StringExtensions.FormatRegionXCoords(seedList[i] + (galaxy * 0x100000000u))}");
                 Logging.Print($"    Portal Coords: {StringExtensions.FormatRegionGrfCoords(seedList[i] + (galaxy * 0x100000000u))}");
