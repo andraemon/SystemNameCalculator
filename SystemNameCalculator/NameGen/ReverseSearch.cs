@@ -13,9 +13,9 @@ namespace SystemNameCalculator.NameGen
         #region Region Methods
         public static void FindRegionSeeds(string name, uint galaxy, int cap = 1)
         {
-            Logging.PrintDebug($"Searching for region with name {name} in galaxy {galaxy} ({galaxy:X})");
+            Logging.Print($"\nSearching for region with name {name} in galaxy {galaxy} ({galaxy:X})");
             List<ulong> seedList = ConstructRegionRanges(name, cap);
-            if (seedList == null)
+            if (seedList == null || seedList.Count == 0)
             {
                 Logging.Print("\nCould not find a region with the given name. Sorry!");
                 return;
@@ -30,7 +30,7 @@ namespace SystemNameCalculator.NameGen
             }
         }
 
-        public static List<ulong> ConstructRegionRanges(string name, int cap)
+        private static List<ulong> ConstructRegionRanges(string name, int cap)
         {
             string origName = name;
             int adorn = -1;
@@ -54,7 +54,7 @@ namespace SystemNameCalculator.NameGen
             }
 
             name = name.ToLower();
-            Logging.PrintDebug($"name: {name}, adorn: {adorn}");
+            Logging.Print($"Name: {name}, Adorn: {adorn}");
             Logging.PrintDebug($"{name.Split().Length}, {name.Length > 9}, {name.Length < 6}, {Generator.VowelInsertedAtStart(name[0], name[1])}, {Generator.VowelInsertedAtEnd(name[^1], name[^2])}, {Generator.GetConsecutiveConsonants(name) != -1}");
 
             if (name.Split().Length != 1
@@ -65,10 +65,11 @@ namespace SystemNameCalculator.NameGen
                 || Generator.GetConsecutiveConsonants(name) != -1)
                 return null;
 
-            Logging.PrintDebug("name format is correct");
+            Logging.Print("Name format is correct.");
 
             weights = GetWeightsForName(name, new byte[] { 0 });
             if (weights[0] == null) return null;
+            Logging.Print("Found valid weights for name generation!");
 
             ranges.Add(new SeedRange(new List<(uint, uint)>(), new List<(uint, uint)> { (0, 0xFFFFFFFF) }, new List<int>()));
             for (int i = 0; i <= 9 - name.Length; i++)
@@ -102,12 +103,14 @@ namespace SystemNameCalculator.NameGen
         }
 
         // Alternative to smart cracker, actually pretty performant so we'll stick with this for now
-        internal static List<ulong> ExhaustiveRegionSearch(List<SeedRange> ranges, int cap, string name)
+        private static List<ulong> ExhaustiveRegionSearch(List<SeedRange> ranges, int cap, string name)
         {
             List<ulong> result = new List<ulong>();
             ulong seed;
             uint bot;
             ulong i = 0;
+            int progress = 0;
+            Logging.PrintSame($"\rFound 0 seeds so far, searched 0% of possible seeds...");
 
             while (true)
             {
@@ -119,7 +122,16 @@ namespace SystemNameCalculator.NameGen
                 if (bot == 0) seed++;
                 seed.UpdateSeed();
 
-                if (TrySeed(seed, ranges) && RegionName.FormatName(BitConverter.GetBytes(i)) == name) result.Add(i);
+                if (TrySeed(seed, ranges) && RegionName.FormatName(BitConverter.GetBytes(i)) == name)
+                {
+                    result.Add(i);
+                    Logging.PrintSame($"\rFound {result.Count} seeds so far, searched {progress}% of possible seeds...");
+                }
+                if (i % 0x28F5C28 == 0)
+                {
+                    progress++;
+                    Logging.PrintSame($"\rFound {result.Count} seeds so far, searched {progress}% of possible seeds...");
+                }
                 if (result.Count == cap || i == 0xFFFFFFFF) break;
 
                 i++;
@@ -130,7 +142,7 @@ namespace SystemNameCalculator.NameGen
         #endregion
 
         #region General Methods
-        public static List<SeedRange> GetNameGenSeedRanges(List<List<WeightData>> data, string name, int constant, (int, int) add, bool alternate)
+        private static List<SeedRange> GetNameGenSeedRanges(List<List<WeightData>> data, string name, int constant, (int, int) add, bool alternate)
         {
             List<SeedRange> result = new List<SeedRange>();
 
@@ -182,10 +194,23 @@ namespace SystemNameCalculator.NameGen
                 }
             }
 
-            return result;
+            return result.VerifyRanges();
         }
 
-        public static bool TrySeed(ulong seed, List<SeedRange> ranges)
+        private static List<SeedRange> VerifyRanges(this List<SeedRange> data)
+        {
+            for (int i = 0; i < data.Count; i++)
+            {
+                for (int j = 0; j < data[i].BotRange.Count; j++)
+                {
+                    if (data[i].BotRange[j].Item2 < data[i].BotRange[j].Item1) data[i].BotRange[j] = (data[i].BotRange[j].Item1, 0xFFFFFFFF);
+                }
+            }
+
+            return data;
+        }
+
+        private static bool TrySeed(ulong seed, List<SeedRange> ranges)
         {
             List<(int, int)> linkInfo = new List<(int, int)>();
             uint bot;
@@ -209,7 +234,7 @@ namespace SystemNameCalculator.NameGen
             return true;
         }
 
-        public static int AlphasetStringIndex(string str, int set)
+        private static int AlphasetStringIndex(string str, int set)
         {
             for (int i = 0; i < Generator.Alphasets[set].Length; i += 3)
             {
@@ -219,7 +244,7 @@ namespace SystemNameCalculator.NameGen
             return -1;
         }
 
-        public static List<List<WeightData>> GetWeightsForName(string name, byte[] alphasets)
+        private static List<List<WeightData>> GetWeightsForName(string name, byte[] alphasets)
         {
             int loop = name.Length - 3;
             List<List<WeightData>> result = new List<List<WeightData>>();
@@ -302,7 +327,7 @@ namespace SystemNameCalculator.NameGen
         }
 
         // Doesn't work (for reasons which are admittedly obvious in retrospect) so we're just going with an exhaustive search for now
-        public static (uint, uint) TopDownCracker(List<SeedRange> ranges)
+        private static (uint, uint) TopDownCracker(List<SeedRange> ranges)
         {
             List<(int, int)> linkInfo = new List<(int, int)>();
             (uint, uint) seed;
@@ -346,7 +371,7 @@ namespace SystemNameCalculator.NameGen
 
         // Given one multiplicand and a desired product, attempts to find the other multiplicand, which will have at most as many bits as the first.
         // Always works if the input multiplicand is odd, may not if it's even.
-        public static bool TryFindMultiplicand(uint input, uint product, out uint multiplicand)
+        private static bool TryFindMultiplicand(uint input, uint product, out uint multiplicand)
         {
             multiplicand = 0;
             if (input == 0 && product != 0) return false;
@@ -375,7 +400,7 @@ namespace SystemNameCalculator.NameGen
             return true;
         }
 
-        public static SeedRange CollapseRanges(this SeedRange data)
+        private static SeedRange CollapseRanges(this SeedRange data)
         {
             data.BotRange = data.BotRange.Collapse();
             data.TopRange = data.TopRange.Collapse();

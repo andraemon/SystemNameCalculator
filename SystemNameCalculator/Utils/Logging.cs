@@ -10,6 +10,12 @@ namespace SystemNameCalculator.Utils
         {
             PrintColor(content, ConsoleColor.Green);
         }
+
+        internal static void PrintSame(string content)
+        {
+            PrintColorSame(content, ConsoleColor.Green);
+        }
+
         internal static void PrintDebug(string debug)
         {
             if (Program.Debug) PrintColor(debug, ConsoleColor.DarkGray);
@@ -34,6 +40,13 @@ namespace SystemNameCalculator.Utils
         {
             Console.ForegroundColor = color;
             Console.WriteLine(content);
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        internal static void PrintColorSame(string content, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.Write(content);
             Console.ForegroundColor = ConsoleColor.White;
         }
 

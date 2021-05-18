@@ -122,10 +122,6 @@ namespace SystemNameCalculator
         {
             Stopwatch watch = new Stopwatch();
             watch.Start();
-            for (int i = 0; i < 100000; i++)
-            {
-                ReverseSearch.TryFindMultiplicand(0x5A76F899, 0xBA67F772, out _);
-            }
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds.ToString());
         }
