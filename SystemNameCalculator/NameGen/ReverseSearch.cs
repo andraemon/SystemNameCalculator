@@ -24,9 +24,9 @@ namespace SystemNameCalculator.NameGen
             for (int i = 0; i < seedList.Count; i++)
             {
                 Logging.Print($"Seed {i + 1}");
-                Logging.Print($"    Signal Booster Coords: {StringExtensions.FormatRegionBoosterCoords((seedList[i] ^ galaxy) + (galaxy * 0x100000000u))}");
-                Logging.Print($"    Save File Coords: {StringExtensions.FormatRegionXCoords((seedList[i] ^ galaxy) + (galaxy * 0x100000000u))}");
-                Logging.Print($"    Portal Coords: {StringExtensions.FormatRegionGrfCoords((seedList[i] ^ galaxy) + (galaxy * 0x100000000u))}");
+                Logging.Print($"    Signal Booster Coords: {StringExtensions.FormatRegionBoosterCoords(seedList[i] + (galaxy * 0x100000000u))}");
+                Logging.Print($"    Save File Coords: {StringExtensions.FormatRegionXCoords(seedList[i] + (galaxy * 0x100000000u))}");
+                Logging.Print($"    Portal Coords: {StringExtensions.FormatRegionGrfCoords(seedList[i] + (galaxy * 0x100000000u))}");
             }
         }
 
@@ -107,7 +107,7 @@ namespace SystemNameCalculator.NameGen
             List<ulong> result = new List<ulong>();
             ulong seed;
             uint bot;
-            uint i = 0;
+            ulong i = 0;
 
             while (true)
             {

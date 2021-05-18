@@ -26,12 +26,12 @@ namespace SystemNameCalculator.Utils
 
         public static string FormatRegionBoosterCoords(this ulong self)
         {
-            return $"{self & 0xFFF:X4}:{(self & 0xFF000000) >> 24:X4}:{(self & 0xFFF000) >> 12:X4}:{(self & 0xFF00000000) >> 32:X4}";
+            return $"{(int)(self & 0xFFF) + 2047:X4}:{(int)((self & 0xFF000000) >> 24) + 127:X4}:{(int)((self & 0xFFF000) >> 12) + 2047:X4}:{(self & 0xFF00000000) >> 32:X4}";
         }
 
         public static string FormatRegionXCoords(this ulong self)
         {
-            return $"X: {(int)(self & 0xFFF) - 2047}, Y: {(int)((self & 0xFF000000) >> 24) - 127}, Z: {(int)((self & 0xFFF000) >> 12) - 2047}";
+            return $"X: {self & 0xFFF}, Y: {(self & 0xFF000000) >> 24}, Z: {(self & 0xFFF000) >> 12}";
         }
     }
 }
