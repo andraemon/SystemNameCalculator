@@ -9,8 +9,8 @@ namespace SystemNameCalculator.NameGen
 {
     public static class RegionName
     {
-        // 0364:0078:0CE5:010A
-        public static void FormatName(byte[] seed)
+        // 0364:0078:0CE5:0000
+        public static string FormatName(byte[] seed)
         {
             byte[][] register = new byte[2][];
             byte[][] cache0 = new byte[2][];
@@ -58,6 +58,7 @@ namespace SystemNameCalculator.NameGen
             }
 
             Logging.PrintDebug(name);
+            return name;
         }
 
         #region Command Parsers

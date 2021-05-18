@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Numerics;
+using System.Text.RegularExpressions;
 using SystemNameCalculator.Utils;
 using SystemNameCalculator.NameGen;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.IO;
 
 namespace SystemNameCalculator
 {
@@ -32,14 +34,16 @@ namespace SystemNameCalculator
             Console.WriteLine("            Format is XXXX:YYYY:ZZZZ:GLXY, where the signal booster has the format STRING:XXXX:YYYY:ZZZZ:SYST.\n");
             Console.WriteLine("        xcoords <x> <y> <z> <galaxyindex> - Finds the name of a region from its galactic coordinates,");
             Console.WriteLine("            as seen in the save file.\n");
-            Console.WriteLine("        find <string> - Attempts to find coordinates for a region with the given name. Not Implemented yet.\n");
+            Console.WriteLine("        find <string> - Attempts to find coordinates for a region with the given name. Not implemented yet.\n");
             Console.WriteLine("    /debug - Toggles debug output.\n");
-             
-        input:
-            Console.ForegroundColor = ConsoleColor.White;
-            Logging.Print("\nWhat is your command?\n");
-            Console.ReadLine().ParseCommand();
-            goto input;
+            ReverseSearch.FindRegionSeeds("Sea of Summer");
+
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Logging.Print("\nWhat is your command?\n");
+                Console.ReadLine().ParseCommand();
+            }
         }
 
         internal static void ParseCommand(this string self)
@@ -111,6 +115,18 @@ namespace SystemNameCalculator
             {
                 Logging.PrintError("\nCould not parse input! Are you sure you typed the command correctly?\n");
             }
+        }
+
+        private static void Test()
+        {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            for (int i = 0; i < 100000; i++)
+            {
+                ReverseSearch.TryFindMultiplicand(0x5A76F899, 0xBA67F772, out _);
+            }
+            watch.Stop();
+            Console.WriteLine(watch.ElapsedMilliseconds.ToString());
         }
     }
 }

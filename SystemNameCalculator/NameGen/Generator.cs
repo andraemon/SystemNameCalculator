@@ -35,12 +35,12 @@ namespace SystemNameCalculator.NameGen
                 for (int i = 0; i < BitConverter.ToInt16(register[0].Sxd(2)); i++)
                 {
                     cache0 = cache0.UpdateSeed();
-                    Dictionary<char, double> charWeights = GetStringWeights(name[i..(i + 3)], cache1[0][0]);
+                    List<(char, double)> charWeights = GetStringWeights(name[i..(i + 3)], cache1[0][0]);
                     target = (float)(BitConverter.ToUInt32(cache0[0]) * BitConverter.ToDouble(TinyDouble));
 
-                    if (charWeights.ElementAt(0).Key == '0')
+                    if (charWeights == null)
                     {
-                        Logging.PrintDebug($"Could not find string weights in alphaset {cache1[0][0]}, trying alternate set (add: {add})");
+                        Logging.PrintDebug($"Could not find string weights in alphaset {cache1[0][0]} (add: {add})");
 
                         tries--;
                         i--;
@@ -82,14 +82,14 @@ namespace SystemNameCalculator.NameGen
 
                             for (j = 0; j < charWeights.Count; j++)
                             {
-                                weight += (float)charWeights.ElementAt(j).Value;
+                                weight += (float)charWeights[j].Item2;
                                 if (weight >= target) break;
                             }
 
                             index = j;
                         }
 
-                        name += charWeights.ElementAt(index).Key;
+                        name += charWeights[index].Item1;
                         add -= 1;
                     }
 
@@ -123,7 +123,7 @@ namespace SystemNameCalculator.NameGen
 
             if (1 < name.Length)
             {
-                if (penult != 'g' || "aeio".Contains(ult))
+                if (penult != 'g' || "aeiou".Contains(ult))
                 {
                     if (ult == 'b' && "gn".Contains(penult)) InsertVowel(ref name, ref cache0, name.Length - 1);
                     else if (ult == 'd' && "bdfghkmpst".Contains(penult)) InsertVowel(ref name, ref cache0, name.Length - 1);
@@ -147,7 +147,7 @@ namespace SystemNameCalculator.NameGen
         }
 
         #region Helper Methods
-        private static int GetConsecutiveConsonants(string name)
+        internal static int GetConsecutiveConsonants(string name)
         {
             int consonance = 0;
             for (int i = 0; i < name.Length; i++)
@@ -183,28 +183,26 @@ namespace SystemNameCalculator.NameGen
             return Alphasets[cache1[0][0]][BitConverter.ToInt16(register[1])..BitConverter.ToInt16(register[1].Add(new byte[] { 0x03 }))];
         }
 
-        public static Dictionary<char, double> GetStringWeights(string str, byte alphaset)
+        public static List<(char, double)> GetStringWeights(string str, byte alphaset)
         {
             return RecursiveSearch(LetterMap[alphaset][str[0]].ToObject<JArray>(), str);
         }
 
-        private static Dictionary<char, double> RecursiveSearch(JArray arr, string str)
+        private static List<(char, double)> RecursiveSearch(JArray arr, string str)
         {
-            Dictionary<char, double> result = null;
+            List<(char, double)> result = null;
             int i = 0;
             while (result == null)
             {
-                if (i >= arr.Count) return new Dictionary<char, double> { { '0', 0 } };
+                if (i >= arr.Count) return null;
                 else if (arr[i].ToObject<JArray>()[2].ToString() == "ja")
                 {
                     if (BitConverter.ToInt32(Encoding.UTF8.GetBytes(str).Zxd(4)) > BitConverter.ToInt32(Encoding.UTF8.GetBytes(arr[i].ToObject<JArray>()[0].ToString()).Zxd(4)))
-                    {
                         result = RecursiveSearch(arr[i].ToObject<JArray>()[1].ToObject<JArray>(), str);
-                    }
                 }
                 else if (arr[i].ToObject<JArray>()[2].ToString() == "jz")
                 {
-                    if (arr[i].ToObject<JArray>()[0].ToString() == str) return arr[i].ToObject<JArray>()[1].ToObject<Dictionary<char, double>>();
+                    if (arr[i].ToObject<JArray>()[0].ToString() == str) return arr[i].ToObject<JArray>()[1].ToObject<List<(char, double)>>();
 
                     result = null;
                 }
@@ -213,6 +211,41 @@ namespace SystemNameCalculator.NameGen
             }
 
             return result;
+        }
+
+        internal static bool VowelInsertedAtStart(char first, char second)
+        {
+            if (!"aeiou".Contains(first) && !"aeiou".Contains(second))
+            {
+                if (first != 's' || !"hklmnprtwy".Contains(second))
+                {
+                    if (second == 'h' && "ctw".Contains(first)) return false;
+                    else if (second == 'l' && "bcfgps".Contains(first)) return false;
+                    else if (second == 'r' && "bcdfgkpt".Contains(first)) return false;
+                    else if (second == 'w' && "dgt".Contains(first)) return false;
+                    else if (second == 'y' && "hmr".Contains(first)) return false;
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        internal static bool VowelInsertedAtEnd(char ult, char penult)
+        {
+            if (penult != 'g' || "aeiou".Contains(ult))
+            {
+                if (ult == 'b' && "gn".Contains(penult)) return true;
+                else if (ult == 'd' && "bdfghkmpst".Contains(penult)) return true;
+                else if (ult == 'g' && penult == 'l') return true;
+                else if (ult == 'p' && "bdhkt".Contains(penult)) return true;
+                else if (ult == 'r' && "bfg".Contains(penult)) return true;
+                else if (ult == 't' && penult == 'g') return true;
+                else if (ult == 'w' && !"aeiou".Contains(penult)) return true;
+            }
+
+            return false;
         }
         #endregion
 

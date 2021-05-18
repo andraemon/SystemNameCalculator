@@ -14,5 +14,9 @@ namespace SystemNameCalculator.Utils
             if (s.Length > 12) s = s[(s.Length - 12)..];
             return Convert.ToInt16(s, 2).ToString($"X{trunc}")[^trunc..];
         }
+        public static bool FastContains(this string self, string value)
+        {
+            return ((self.Length - self.Replace(value, string.Empty).Length) / value.Length) > 0;
+        }
     }
 }
