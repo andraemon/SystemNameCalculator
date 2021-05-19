@@ -24,7 +24,7 @@ namespace SystemNameCalculator
             Console.WriteLine("--------------------------\r");
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Commands:\n");
-            Console.WriteLine("    /system <command> <arguments>\n");
+            Console.WriteLine("    /system <command> <arguments> (NOTE: System name calculation is unfinished and may return inaccurate names)\n");
             Console.WriteLine("        coords <string> - Finds the name of a system from its galactic coordinates, as seen in the signal booster.");
             Console.WriteLine("            Format is XXXX:YYYY:ZZZZ:SYST:GLXY, where the signal booster has the format STRING:XXXX:YYYY:ZZZZ:SYST.\n");
             Console.WriteLine("        xcoords <x> <y> <z> <systemindex> <galaxyindex> - Finds the name of a system from its galactic coordinates,");
@@ -61,18 +61,18 @@ namespace SystemNameCalculator
                 {
                     Console.WriteLine();
                     byte[] seed = vars[2].SystemCoordsToByteArray();
-                    if (seed != null) SystemName.FormatName(seed);
+                    if (seed != null) Logging.Print(SystemName.FormatName(seed));
                 }
                 else if (vars[1] == "xcoords")
                 {
                     Console.WriteLine();
                     byte[] seed = vars.SystemXCoordsToByteArray();
-                    if (seed != null) SystemName.FormatName(seed);
+                    if (seed != null) Logging.Print(SystemName.FormatName(seed));
                 }
                 else if (vars[1] == "grfcoords")
                 {
                     Console.WriteLine();
-                    SystemName.FormatName(vars[2].Parse());
+                    Logging.Print(SystemName.FormatName(vars[2].Parse()));
                 }
                 else
                 {
@@ -89,18 +89,18 @@ namespace SystemNameCalculator
                 {
                     Console.WriteLine();
                     byte[] seed = vars[2].RegionCoordsToByteArray();
-                    if (seed != null) RegionName.FormatName(seed);
+                    if (seed != null) Logging.Print(RegionName.FormatName(seed));
                 }
                 else if (vars[1] == "xcoords")
                 {
                     Console.WriteLine();
                     byte[] seed = vars.RegionXCoordsToByteArray();
-                    if (seed != null) RegionName.FormatName(seed);
+                    if (seed != null) Logging.Print(RegionName.FormatName(seed));
                 }
                 else if (vars[1] == "grfcoords")
                 {
                     Console.WriteLine();
-                    RegionName.FormatName(vars[2].Parse());
+                    Logging.Print(RegionName.FormatName(vars[2].Parse()));
                 }
                 else
                 {

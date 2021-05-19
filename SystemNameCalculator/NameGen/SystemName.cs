@@ -16,7 +16,7 @@ namespace SystemNameCalculator.NameGen
     // 0364:0078:0CE5:010A
     public static class SystemName
     {
-        public static void FormatName(byte[] seed)
+        public static string FormatName(byte[] seed)
         {
             byte[] galacticCoords = seed.Shl(4);
             byte[] systemIndex = seed.Shr(4);
@@ -58,6 +58,7 @@ namespace SystemNameCalculator.NameGen
             name = char.ToUpper(name[0]) + name[1..];
 
             Logging.PrintDebug(name);
+            return name;
         }
 
         #region Command Parsers
