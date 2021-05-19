@@ -20,7 +20,7 @@ namespace SystemNameCalculator
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("NMS System Name Calculator\r");
-            Console.WriteLine("Built for game version 3.37 (build ID 6546017)\r");
+            Console.WriteLine("Built for game version 3.40 (build ID 6694623)\r");
             Console.WriteLine("--------------------------\r");
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Commands:\n");
