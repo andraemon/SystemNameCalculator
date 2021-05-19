@@ -14,7 +14,7 @@ namespace SystemNameCalculator
 {
     public static class Program
     {
-        internal static bool Debug = false;
+        internal static bool Debug = true;
 
         public static void Main()
         {
@@ -38,6 +38,7 @@ namespace SystemNameCalculator
             Console.WriteLine("        find <galaxyIndex> <count> <string> - Attempts to find coordinates for a number of regions with the given name");
             Console.WriteLine("            in the given galaxy (where Euclid has index 0).\n");
             Console.WriteLine("    /debug - Toggles debug output.\n");
+            Console.WriteLine(unchecked(((0x1001u + (1u * 0x100000000u)) ^ (1u / 2)) * 0x64DD81482CBD31D7u).ToString("X"));
 
             while (true)
             {

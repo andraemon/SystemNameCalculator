@@ -21,7 +21,7 @@ namespace SystemNameCalculator.Utils
 
         public static string FormatRegionGrfCoords(this ulong self)
         {
-            return self.ToString("X").PadLeft(12, '0');
+            return "0001" + (self & 0xFFFFFFFF).ToString("X").PadLeft(8, '0');
         }
 
         public static string FormatRegionBoosterCoords(this ulong self)

@@ -14,7 +14,7 @@ namespace SystemNameCalculator.NameGen
         public static void FindRegionSeeds(string name, uint galaxy, int cap = 1)
         {
             Logging.Print($"\nSearching for region with name {name} in galaxy {galaxy} ({galaxy:X})");
-            List<ulong> seedList = ConstructRegionRanges(name, cap);
+            List<ulong> seedList = ConstructRegionRanges(name, cap, galaxy);
             if (seedList == null || seedList.Count == 0)
             {
                 Logging.Print("\nCould not find a region with the given name. Sorry!");
@@ -30,7 +30,7 @@ namespace SystemNameCalculator.NameGen
             }
         }
 
-        private static List<ulong> ConstructRegionRanges(string name, int cap)
+        private static List<ulong> ConstructRegionRanges(string name, int cap, uint galaxy)
         {
             string origName = name;
             int adorn = -1;
@@ -99,22 +99,25 @@ namespace SystemNameCalculator.NameGen
                 Logging.PrintDebug($"    LinkOffset: {ranges[i].LinkOffset}");
             }
 
-            return ExhaustiveRegionSearch(ranges, cap, origName);
+            return ExhaustiveRegionSearch(ranges, cap, origName, galaxy);
         }
 
         // Alternative to smart cracker, actually pretty performant so we'll stick with this for now
-        private static List<ulong> ExhaustiveRegionSearch(List<SeedRange> ranges, int cap, string name)
+        private static List<ulong> ExhaustiveRegionSearch(List<SeedRange> ranges, int cap, string name, uint galaxy)
         {
             List<ulong> result = new List<ulong>();
             ulong seed;
             uint bot;
             ulong i = 0;
+            ulong current;
             int progress = 0;
             Logging.PrintSame($"\rFound 0 seeds so far, searched 0% of possible seeds...");
 
             while (true)
             {
-                seed = unchecked(i * 0x64DD81482CBD31D7u);
+                current = i + (galaxy * 0x100000000u);
+                seed = unchecked(current ^ (galaxy / 2));
+                seed = unchecked(seed * 0x64DD81482CBD31D7u);
                 seed = unchecked((((seed >> 32) / 2) ^ seed) * 0xE36AA5C613612997u);
                 seed = ((seed >> 32) / 2) ^ seed;
                 bot = (uint)(seed & 0xFFFFFFFF);
@@ -122,9 +125,9 @@ namespace SystemNameCalculator.NameGen
                 if (bot == 0) seed++;
                 seed.UpdateSeed();
 
-                if (TrySeed(seed, ranges) && RegionName.FormatName(BitConverter.GetBytes(i)) == name)
+                if (TrySeed(seed, ranges) && RegionName.FormatName(BitConverter.GetBytes(current)) == name)
                 {
-                    result.Add(i);
+                    result.Add(current);
                     Logging.PrintSame($"\rFound {result.Count} seeds so far, searched {progress}% of possible seeds...");
                 }
                 if (i % 0x28F5C28 == 0)
