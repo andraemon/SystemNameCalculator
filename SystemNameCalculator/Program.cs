@@ -107,7 +107,7 @@ namespace SystemNameCalculator
                     Logging.PrintError("\nCould not parse input! Are you sure you typed the command correctly?\n");
                 }
             }
-            else if (vars[0] == "debug")
+            else if (vars[0] == "/debug")
             {
                 Debug = !Debug;
                 Logging.Print("Toggled debug mode!");
