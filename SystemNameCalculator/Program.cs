@@ -29,7 +29,7 @@ namespace SystemNameCalculator
             Console.WriteLine("            Format is XXXX:YYYY:ZZZZ:SYST:GLXY, where the signal booster has the format STRING:XXXX:YYYY:ZZZZ:SYST.\n");
             Console.WriteLine("        xcoords <x> <y> <z> <systemindex> <galaxyindex> - Finds the name of a system from its galactic coordinates,");
             Console.WriteLine("            as seen in the save file.\n");
-            Console.WriteLine("        find <string> - Attempts to find coordinates for a system with the given name. Not implemented yet.\n");
+            Console.WriteLine("        find <galaxyIndex> <count> <string> - Attempts to find coordinates for a system with the given name.\n");
             Console.WriteLine("    /region <command> <arguments>\n");
             Console.WriteLine("        coords <string> - Finds the name of a region from its galactic coordinates, as seen in the signal booster.");
             Console.WriteLine("            Format is XXXX:YYYY:ZZZZ:GLXY, where the signal booster has the format STRING:XXXX:YYYY:ZZZZ:SYST.\n");
@@ -55,7 +55,7 @@ namespace SystemNameCalculator
             {
                 if (vars[1] == "find")
                 {
-                    Logging.Print("\nPlaceholder\n");
+                    ReverseSearch.FindSystemSeeds(string.Join(' ', vars.Skip(4)), Convert.ToUInt32(vars[2]), Convert.ToInt32(vars[3]));
                 }
                 else if (vars[1] == "coords")
                 {
