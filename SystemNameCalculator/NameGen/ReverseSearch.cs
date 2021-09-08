@@ -10,6 +10,120 @@ namespace SystemNameCalculator.NameGen
 {
     public static class ReverseSearch
     {
+        #region System Methods
+        public static void FindSystemSeeds(string name, uint galaxy, int cap = 1)
+        {
+            Logging.Print($"\nSearching for system with name {name} in galaxy {galaxy} ({galaxy:X})");
+            List<ulong> seedList = ConstructSystemRanges(name, cap, galaxy);
+            if (seedList == null || seedList.Count == 0)
+            {
+                Logging.Print("\nCould not find a system with the given name. Sorry!");
+                return;
+            }
+
+            for (int i = 0; i < seedList.Count; i++)
+            {
+                // TODO: Print system coordinates
+                Logging.Print($"\nSeed {i + 1}: {seedList[i]}");
+            }
+        }
+
+        private static List<ulong> ConstructSystemRanges(string name, int cap, uint galaxy)
+        {
+            string origName = name;
+            List<List<WeightData>> weights = new List<List<WeightData>>();
+            List<SeedRange> ranges = new List<SeedRange>();
+            Random r = new Random();
+            string[] split = name.Split();
+
+            // System names do not have adornments right?
+
+            name = name.ToLower();
+            Logging.Print($"Name: {name}");
+            Logging.PrintDebug($"{name.Split().Length}, {name.Length > 9}, {name.Length < 6}, {Generator.VowelInsertedAtStart(name[0], name[1])}, {Generator.VowelInsertedAtEnd(name[^1], name[^2])}, {Generator.GetConsecutiveConsonants(name) != -1}");
+
+            if (name.Split().Length != 1
+                || name.Length > 9
+                || name.Length < 6
+                || Generator.VowelInsertedAtStart(name[0], name[1])
+                || Generator.VowelInsertedAtEnd(name[^1], name[^2])
+                || Generator.GetConsecutiveConsonants(name) != -1)
+                return null;
+
+            Logging.Print("Name format is correct.");
+
+            weights = GetWeightsForName(name, new byte[] { 0 });
+            if (weights[0] == null) return null;
+            Logging.Print("Found valid weights for name generation!");
+
+            ranges.Add(new SeedRange(new List<(uint, uint)>(), new List<(uint, uint)> { (0, 0xFFFFFFFF) }, new List<int>()));
+            for (int i = 0; i <= 9 - name.Length; i++)
+            {
+                ranges[0].BotRange.Add(((uint)((3 - i) * 0x100000000 / 4),
+                    (uint)((((3 - i) * 0x100000000) + 0xFFFFFFFF) / 4)));
+                ranges[0].Updates.Add(1);
+            }
+            ranges[0].LinkOffset = 2;
+
+            ranges.AddRange(GetNameGenSeedRanges(weights, name, 6, (name.Length, 9), false));
+
+            ranges.Add(new SeedRange(new List<(uint, uint)> { (0xCCCCCCCD, 0xFFFFFFFF) }, new List<(uint, uint)> { (0, 0xFFFFFFFF) }, new List<int> { 1 }));
+
+            for (int i = 0; i < ranges.Count; i++)
+            {
+                Logging.PrintDebug($"RANGE {i + 1}");
+                Logging.PrintDebug("    BotRanges");
+                for (int j = 0; j < ranges[i].BotRange.Count; j++)
+                    Logging.PrintDebug($"        Min: {ranges[i].BotRange[j].Item1:X}, Max: {ranges[i].BotRange[j].Item2:X}, Updates: {ranges[i].Updates[j]}");
+                Logging.PrintDebug($"    LinkOffset: {ranges[i].LinkOffset}");
+            }
+
+            return ExhaustiveSystemSearch(ranges, cap, origName, galaxy);
+        }
+
+        private static List<ulong> ExhaustiveSystemSearch(List<SeedRange> ranges, int cap, string name, uint galaxy)
+        {
+            List<ulong> result = new List<ulong>();
+            ulong seed;
+            uint bot;
+            ulong i = 0;
+            ulong current;
+            int progress = 0;
+            Logging.PrintSame($"\rFound 0 seeds so far, searched 0% of possible seeds...");
+
+            while (true)
+            {
+                current = i + (galaxy * 0x100000000u);
+                seed = unchecked(current ^ (galaxy / 2));
+                seed = unchecked(seed * 0x64DD81482CBD31D7u);
+                seed = unchecked((((seed >> 32) / 2) ^ seed) * 0xE36AA5C613612997u);
+                seed = ((seed >> 32) / 2) ^ seed;
+                bot = (uint)(seed & 0xFFFFFFFF);
+                seed = unchecked(bot + (BitOperations.RotateLeft(bot, 16) ^ (seed >> 32) ^ bot) * 0x100000000);
+                if (bot == 0) seed++;
+                seed.UpdateSeed();
+
+                if (TrySeed(seed, ranges) && SystemName.FormatName(BitConverter.GetBytes(current)) == name)
+                {
+                    result.Add(current);
+                    Logging.PrintSame($"\rFound {result.Count} seeds so far, searched {progress}% of possible seeds...");
+                }
+                if (i % 0x28F5C28 == 0)
+                {
+                    progress++;
+                    Logging.PrintSame($"\rFound {result.Count} seeds so far, searched {progress}% of possible seeds...");
+                }
+                if (result.Count == cap || i == 0xFFFFFFFF) break;
+
+                i++;
+            }
+
+            return result;
+        }
+
+
+        #endregion
+
         #region Region Methods
         public static void FindRegionSeeds(string name, uint galaxy, int cap = 1)
         {
